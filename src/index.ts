@@ -8,7 +8,7 @@ import { FREE_MODELS } from './utils/prompts'
 const app = new Elysia()
   .use(cors())
   .use(staticPlugin({
-    assets: 'public',
+    assets: '.',
     prefix: '/',
     alwaysStatic: true,
     noCache: true
@@ -22,7 +22,7 @@ const app = new Elysia()
       ? 'API key configured on server'
       : 'Enter your OpenRouter API key'
   }))
-  .get('/', () => Bun.file('public/index.html'))
+  .get('/', () => Bun.file('index.html'))
   .listen(3000)
 
 console.log(`
