@@ -8,10 +8,12 @@ import { FREE_MODELS } from './utils/prompts'
 const app = new Elysia()
   .use(cors())
   .use(staticPlugin({
-    assets: '.',
-    prefix: '/',
-    alwaysStatic: true,
-    noCache: true
+    assets: 'styles',
+    prefix: '/styles'
+  }))
+  .use(staticPlugin({
+    assets: 'scripts',
+    prefix: '/scripts'
   }))
   .use(uploadRoutes)
   .use(extractRoutes)
