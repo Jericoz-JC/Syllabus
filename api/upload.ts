@@ -1,6 +1,5 @@
 // pdfjs-serverless is designed specifically for Edge/serverless environments
-// @ts-ignore - Type definitions may not be available
-import { getDocumentProxy, extractText } from 'pdfjs-serverless'
+import { getDocument } from 'pdfjs-serverless'
 
 export const config = {
   runtime: 'edge'
@@ -20,8 +19,28 @@ export default async function handler(req: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer))
-    const { text } = await extractText(pdf, { mergePages: true })
+
+    // Use getDocument from pdfjs-serverless (the correct API)
+    const pdf = await getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useSystemFonts: true,
+    }).promise
+
+    // Extract text from all pages
+    const numPages = pdf.numPages
+    const textParts: string[] = []
+
+    for (let i = 1; i <= numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .filter((item): boolean => 'str' in item && typeof (item as { str: unknown }).str === 'string')
+        .map(item => (item as { str: string }).str)
+        .join(' ')
+      textParts.push(pageText)
+    }
+
+    const text = textParts.join('\n\n')
 
     return Response.json({
       success: true,

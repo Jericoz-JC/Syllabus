@@ -32,8 +32,15 @@ export async function callOpenRouter(request: OpenRouterRequest): Promise<OpenRo
     throw new Error(`OpenRouter API error: ${response.status} - ${error}`)
   }
 
-  const data = await response.json()
+  const data = await response.json() as {
+    choices: Array<{ message: { content: string; reasoning?: string } }>
+    model: string
+    usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number }
+  }
   const choice = data.choices[0]
+  if (!choice) {
+    throw new Error('No response from AI model')
+  }
 
   return {
     content: choice.message.content,

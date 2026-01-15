@@ -74,13 +74,34 @@ function generateMarkdown(data: any): string {
   return lines.join('\n')
 }
 
+interface ExtractRequest {
+  text: string
+  model: string
+  apiKey?: string
+}
+
+interface OpenRouterResponse {
+  choices: Array<{
+    message: {
+      content: string
+      reasoning?: string
+    }
+  }>
+  model: string
+  usage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+}
+
 export default async function handler(req: Request) {
   if (req.method !== 'POST') {
     return Response.json({ error: 'Method not allowed' }, { status: 405 })
   }
 
   try {
-    const { text, model, apiKey: clientKey } = await req.json()
+    const { text, model, apiKey: clientKey }: ExtractRequest = await req.json() as ExtractRequest
 
     // Use server-side key if available, otherwise use client-provided key
     const apiKey = process.env.OPENROUTER_API_KEY || clientKey
@@ -116,8 +137,11 @@ export default async function handler(req: Request) {
       throw new Error(`OpenRouter API error: ${response.status} - ${error}`)
     }
 
-    const data = await response.json()
+    const data = await response.json() as OpenRouterResponse
     const choice = data.choices[0]
+    if (!choice) {
+      throw new Error('No response from AI model')
+    }
     const content = choice.message.content
 
     // Parse JSON response
