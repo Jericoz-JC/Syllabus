@@ -1,36 +1,9 @@
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
+// pdfjs-serverless is designed specifically for Edge/serverless environments
+// @ts-ignore - Type definitions may not be available
+import { getDocumentProxy, extractText } from 'pdfjs-serverless'
 
 export const config = {
   runtime: 'edge'
-}
-
-// Disable worker for Edge runtime compatibility
-// @ts-ignore - workerPort is a valid way to disable workers
-pdfjsLib.GlobalWorkerOptions.workerPort = null
-
-async function extractTextFromPDF(buffer: ArrayBuffer): Promise<string> {
-  const pdf = await pdfjsLib.getDocument({
-    data: new Uint8Array(buffer),
-    useSystemFonts: true,
-    isEvalSupported: false,
-    disableAutoFetch: true,
-    disableStream: true,
-    disableFontFace: true
-  }).promise
-
-  const textParts: string[] = []
-
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i)
-    const content = await page.getTextContent()
-    const pageText = content.items
-      .filter((item: any) => item.str != null)
-      .map((item: any) => item.str + (item.hasEOL ? '\n' : ''))
-      .join('')
-    textParts.push(pageText)
-  }
-
-  return textParts.join('\n').replace(/\s+/g, ' ')
 }
 
 export default async function handler(req: Request) {
@@ -47,7 +20,8 @@ export default async function handler(req: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const text = await extractTextFromPDF(arrayBuffer)
+    const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer))
+    const { text } = await extractText(pdf, { mergePages: true })
 
     return Response.json({
       success: true,
