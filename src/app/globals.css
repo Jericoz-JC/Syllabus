@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: theme('colors.border');
+  }
+
+  body {
+    @apply bg-background text-foreground font-mono antialiased;
+    font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on;
+  }
+
+  ::selection {
+    @apply bg-accent text-background;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-elevated;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dim;
+  }
+}
+
+@layer components {
+  /* Button base styles */
+  .btn {
+    @apply px-4 py-2 text-xs font-semibold tracking-wider uppercase;
+    @apply border border-border rounded;
+    @apply transition-all duration-200;
+    @apply hover:border-accent hover:text-accent;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-background border-accent;
+    @apply hover:bg-accent-hover hover:border-accent-hover hover:text-background;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-foreground;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-3 py-2 text-sm;
+    @apply bg-background-input border border-border rounded;
+    @apply text-foreground placeholder:text-dim;
+    @apply focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent;
+    @apply transition-colors duration-200;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5;
+    @apply text-[0.65rem] font-semibold tracking-wider uppercase;
+    @apply border rounded-sm;
+  }
+
+  .badge-exam, .badge-midterm, .badge-final {
+    @apply text-exam bg-exam/10 border-exam/30;
+  }
+
+  .badge-assignment {
+    @apply text-assignment bg-assignment/10 border-assignment/30;
+  }
+
+  .badge-quiz {
+    @apply text-quiz bg-quiz/10 border-quiz/30;
+  }
+
+  .badge-project {
+    @apply text-project bg-project/10 border-project/30;
+  }
+
+  .badge-other {
+    @apply text-muted bg-muted/10 border-muted/30;
+  }
+}
+
+/* Subtle grain texture overlay */
+.grain-overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}

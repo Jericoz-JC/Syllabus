@@ -1,14 +1,12 @@
-export const config = {
-  runtime: 'nodejs'
-}
+import { NextResponse } from 'next/server'
 
-export default function handler() {
+export async function GET() {
   const hasServerKey = !!process.env.OPENROUTER_API_KEY
 
-  return Response.json({
+  return NextResponse.json({
     hasServerKey,
     message: hasServerKey
       ? 'API key configured on server'
-      : 'Enter your OpenRouter API key'
+      : 'Enter your OpenRouter API key',
   })
 }

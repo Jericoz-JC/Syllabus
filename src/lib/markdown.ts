@@ -1,17 +1,4 @@
-interface ExtractedEvent {
-  type: string
-  title: string
-  dueDate: string
-  description?: string
-  weight?: string
-}
-
-interface ExtractedData {
-  courseName: string
-  instructor: string
-  semester: string
-  events: ExtractedEvent[]
-}
+import type { ExtractedData } from '@/types'
 
 export function generateMarkdown(data: ExtractedData): string {
   const lines: string[] = [
@@ -23,7 +10,7 @@ export function generateMarkdown(data: ExtractedData): string {
     '## Important Dates',
     '',
     '| Date | Type | Title | Weight |',
-    '|------|------|-------|--------|'
+    '|------|------|-------|--------|',
   ]
 
   const events = data.events || []
