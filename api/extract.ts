@@ -1,5 +1,6 @@
 export const config = {
-  runtime: 'edge'
+  runtime: 'nodejs',
+  maxDuration: 60
 }
 
 const EXTRACTION_PROMPT = `You are a syllabus parser. Extract all important dates, deadlines, and events from the provided syllabus text.
