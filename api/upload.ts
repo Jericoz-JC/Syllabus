@@ -1,8 +1,9 @@
-// unpdf is designed specifically for Edge/serverless environments
-import { getDocumentProxy, extractText } from 'unpdf'
+// Use Node.js runtime for reliable PDF parsing (Edge has bundling issues with pdfjs)
+import pdf from 'pdf-parse'
 
 export const config = {
-  runtime: 'edge'
+  runtime: 'nodejs',
+  maxDuration: 30
 }
 
 export default async function handler(req: Request) {
@@ -19,10 +20,10 @@ export default async function handler(req: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
-    // Use unpdf's Edge-compatible API
-    const pdf = await getDocumentProxy(new Uint8Array(arrayBuffer))
-    const { text } = await extractText(pdf, { mergePages: true })
+    const data = await pdf(buffer)
+    const text = data.text.replace(/\s+/g, ' ').trim()
 
     return Response.json({
       success: true,
