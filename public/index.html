@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Extract due dates, midterms, and assignments from university syllabi using AI. Compare models and export to markdown.">
+  <title>Syllabus Parser — AI-Powered Date Extraction</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <h1 class="logo">Syllabus<span class="logo-dot"></span></h1>
+      </div>
+      <p class="tagline">Extract deadlines from any syllabus PDF</p>
+    </header>
+
+    <section class="config">
+      <div class="field">
+        <label class="field-label" for="api-key">API Key</label>
+        <input
+          type="password"
+          id="api-key"
+          class="field-input"
+          placeholder="sk-or-v1-..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="save-key" class="btn btn-secondary">Save</button>
+      </div>
+      <div class="field">
+        <label class="field-label" for="model">Model</label>
+        <select id="model" class="field-input">
+          <option value="">Loading...</option>
+        </select>
+        <span></span>
+      </div>
+    </section>
+
+    <section class="dropzone" id="dropzone">
+      <div class="dropzone-content">
+        <div class="dropzone-icon">PDF</div>
+        <p class="dropzone-title">Drop your syllabus here</p>
+        <p class="dropzone-hint">or click to browse files</p>
+      </div>
+      <input type="file" id="file-input" accept=".pdf,application/pdf" hidden />
+      <div class="progress hidden" id="progress">
+        <div class="progress-bar">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-text">
+          <span class="spinner"></span>
+          <span id="progress-label">Processing...</span>
+        </div>
+      </div>
+    </section>
+
+    <div id="error-container"></div>
+
+    <section class="results hidden" id="results">
+      <div class="results-header">
+        <h2 class="results-title">Extracted Events</h2>
+        <div class="results-actions">
+          <button id="download-md" class="btn btn-primary">Download .md</button>
+          <button id="toggle-raw" class="btn btn-secondary">Raw</button>
+          <button id="clear" class="btn btn-secondary">Clear</button>
+        </div>
+      </div>
+
+      <div class="course-card" id="course-card">
+        <div class="course-card-accent"></div>
+        <div class="course-card-content">
+          <div class="course-name" id="course-name">—</div>
+          <div class="course-meta" id="course-meta">—</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" id="events-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Title</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody id="events-body"></tbody>
+        </table>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="raw-panel hidden" id="raw-panel">
+        <div class="raw-panel-header">
+          <span>Raw Response</span>
+          <span id="model-used"></span>
+        </div>
+        <div class="raw-panel-content">
+          <pre id="raw-content"></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Built for comparing AI extraction models</p>
+    </footer>
+  </div>
+
+  <script src="/scripts/app.js"></script>
+</body>
+</html>

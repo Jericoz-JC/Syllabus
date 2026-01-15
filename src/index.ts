@@ -1,0 +1,33 @@
+import { Elysia } from 'elysia'
+import { staticPlugin } from '@elysiajs/static'
+import { cors } from '@elysiajs/cors'
+import { uploadRoutes } from './routes/upload'
+import { extractRoutes } from './routes/extract'
+import { FREE_MODELS } from './utils/prompts'
+
+const app = new Elysia()
+  .use(cors())
+  .use(staticPlugin({
+    assets: 'public',
+    prefix: '/',
+    alwaysStatic: true,
+    noCache: true
+  }))
+  .use(uploadRoutes)
+  .use(extractRoutes)
+  .get('/api/models', () => FREE_MODELS)
+  .get('/', () => Bun.file('public/index.html'))
+  .listen(3000)
+
+console.log(`
+╔═══════════════════════════════════════════════════════════╗
+║                    SYLLABUS PARSER                        ║
+║═══════════════════════════════════════════════════════════║
+║  Server running at http://localhost:${app.server?.port}                 ║
+║                                                           ║
+║  API Endpoints:                                           ║
+║    POST /api/upload   - Upload PDF                        ║
+║    POST /api/extract  - Extract with AI                   ║
+║    GET  /api/models   - List available models             ║
+╚═══════════════════════════════════════════════════════════╝
+`)
