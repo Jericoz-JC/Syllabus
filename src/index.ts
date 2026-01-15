@@ -16,6 +16,12 @@ const app = new Elysia()
   .use(uploadRoutes)
   .use(extractRoutes)
   .get('/api/models', () => FREE_MODELS)
+  .get('/api/config', () => ({
+    hasServerKey: !!process.env.OPENROUTER_API_KEY,
+    message: process.env.OPENROUTER_API_KEY
+      ? 'API key configured on server'
+      : 'Enter your OpenRouter API key'
+  }))
   .get('/', () => Bun.file('public/index.html'))
   .listen(3000)
 

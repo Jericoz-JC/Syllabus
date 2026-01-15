@@ -6,7 +6,14 @@ import { EXTRACTION_PROMPT } from '../utils/prompts'
 export const extractRoutes = new Elysia({ prefix: '/api' })
   .post('/extract', async ({ body }) => {
     try {
-      const { text, model, apiKey } = body
+      const { text, model, apiKey: clientKey } = body
+
+      // Use server-side key if available, otherwise use client-provided key
+      const apiKey = process.env.OPENROUTER_API_KEY || clientKey
+
+      if (!apiKey) {
+        return { success: false, error: 'No API key configured' }
+      }
 
       const response = await callOpenRouter({
         apiKey,
@@ -61,6 +68,6 @@ export const extractRoutes = new Elysia({ prefix: '/api' })
     body: t.Object({
       text: t.String(),
       model: t.String(),
-      apiKey: t.String()
+      apiKey: t.Optional(t.String())
     })
   })

@@ -9,13 +9,15 @@ const $$ = (sel) => document.querySelectorAll(sel)
 let state = {
   extracted: null,
   markdown: '',
-  models: []
+  models: [],
+  hasServerKey: false
 }
 
 // Elements
 const els = {
   dropzone: $('#dropzone'),
   fileInput: $('#file-input'),
+  apiKeyField: $('#api-key-field'),
   apiKey: $('#api-key'),
   saveKey: $('#save-key'),
   model: $('#model'),
@@ -37,9 +39,14 @@ const els = {
 
 // Initialize
 async function init() {
-  // Restore saved API key
-  const savedKey = localStorage.getItem('openrouter_key')
-  if (savedKey) els.apiKey.value = savedKey
+  // Check if server has API key configured
+  await checkServerConfig()
+
+  // Restore saved API key (only if server doesn't have one)
+  if (!state.hasServerKey) {
+    const savedKey = localStorage.getItem('openrouter_key')
+    if (savedKey) els.apiKey.value = savedKey
+  }
 
   // Load models
   await loadModels()
@@ -50,6 +57,21 @@ async function init() {
 
   // Bind events
   bindEvents()
+}
+
+async function checkServerConfig() {
+  try {
+    const res = await fetch('/api/config')
+    const config = await res.json()
+    state.hasServerKey = config.hasServerKey
+
+    // Hide API key field if server has key
+    if (state.hasServerKey && els.apiKeyField) {
+      els.apiKeyField.classList.add('hidden')
+    }
+  } catch {
+    state.hasServerKey = false
+  }
 }
 
 async function loadModels() {
@@ -71,9 +93,11 @@ async function loadModels() {
 
 function bindEvents() {
   // Save API key
-  els.saveKey.onclick = () => {
-    localStorage.setItem('openrouter_key', els.apiKey.value)
-    toast('API key saved', 'success')
+  if (els.saveKey) {
+    els.saveKey.onclick = () => {
+      localStorage.setItem('openrouter_key', els.apiKey.value)
+      toast('API key saved', 'success')
+    }
   }
 
   // Save model preference
@@ -116,8 +140,9 @@ function bindEvents() {
 }
 
 async function processFile(file) {
-  const apiKey = els.apiKey.value.trim()
-  if (!apiKey) {
+  // Only require API key if server doesn't have one
+  const apiKey = els.apiKey?.value?.trim() || ''
+  if (!state.hasServerKey && !apiKey) {
     showError('Enter your OpenRouter API key first')
     return
   }
@@ -152,7 +177,7 @@ async function processFile(file) {
       body: JSON.stringify({
         text: uploadData.text,
         model: els.model.value,
-        apiKey
+        apiKey // Server will use its key if available
       })
     })
     const result = await extractRes.json()

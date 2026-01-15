@@ -80,10 +80,17 @@ export default async function handler(req: Request) {
   }
 
   try {
-    const { text, model, apiKey } = await req.json()
+    const { text, model, apiKey: clientKey } = await req.json()
 
-    if (!text || !model || !apiKey) {
+    // Use server-side key if available, otherwise use client-provided key
+    const apiKey = process.env.OPENROUTER_API_KEY || clientKey
+
+    if (!text || !model) {
       return Response.json({ success: false, error: 'Missing required fields' })
+    }
+
+    if (!apiKey) {
+      return Response.json({ success: false, error: 'No API key configured' })
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
