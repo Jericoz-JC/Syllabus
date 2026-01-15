@@ -17,8 +17,6 @@
     "@elysiajs/cors": "^1.4.1",
     "@elysiajs/static": "^1.4.7",
     "elysia": "^1.4.22",
-    "pdfjs-dist": "^5.4.530",
-    "pdfjs-serverless": "^1.1.0",
     "unpdf": "^1.4.0"
   }
 }
