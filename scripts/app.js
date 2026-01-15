@@ -62,6 +62,7 @@ async function init() {
 async function checkServerConfig() {
   try {
     const res = await fetch('/api/config')
+    if (!res.ok) throw new Error('Config fetch failed')
     const config = await res.json()
     state.hasServerKey = config.hasServerKey
 
@@ -77,6 +78,7 @@ async function checkServerConfig() {
 async function loadModels() {
   try {
     const res = await fetch('/api/models')
+    if (!res.ok) throw new Error('Models fetch failed')
     state.models = await res.json()
   } catch {
     state.models = [
@@ -161,6 +163,12 @@ async function processFile(file) {
       method: 'POST',
       body: formData
     })
+
+    if (!uploadRes.ok) {
+      const text = await uploadRes.text()
+      throw new Error(`Upload failed: ${uploadRes.status} - ${text.slice(0, 100)}`)
+    }
+
     const uploadData = await uploadRes.json()
 
     if (!uploadData.success) {
@@ -180,6 +188,12 @@ async function processFile(file) {
         apiKey // Server will use its key if available
       })
     })
+
+    if (!extractRes.ok) {
+      const text = await extractRes.text()
+      throw new Error(`Extraction failed: ${extractRes.status} - ${text.slice(0, 100)}`)
+    }
+
     const result = await extractRes.json()
 
     if (!result.success) {
